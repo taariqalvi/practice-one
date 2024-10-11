@@ -1,92 +1,91 @@
-import React, { useState } from 'react';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
-import './PhoneAuth.css';
+import React, { useState } from "react";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { auth } from "../firebaseConfig"; // Adjust path as necessary
+import "./PhoneAuth.css";
 
 const PhoneAuth = () => {
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [verificationCode, setVerificationCode] = useState('');
-    const [isCodeSent, setIsCodeSent] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [verificationCode, setVerificationCode] = useState("");
+    const [confirmationResult, setConfirmationResult] = useState(null);
 
-    // Set up Recaptcha
+    // Set up reCAPTCHA verifier
     const setupRecaptcha = () => {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-            'recaptcha-container',
-            {
-                'size': 'invisible',
-                'callback': (response) => {
-                    sendVerificationCode();
+        // Check if recaptchaVerifier is already created
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(
+                "recaptcha-container", // The HTML element ID where reCAPTCHA will render
+                {
+                    size: "invisible", // Make it invisible; alternatively, you can set it to 'normal'
+                    callback: (response) => {
+                        // reCAPTCHA solved - will proceed with send verification code
+                    },
+                    "expired-callback": () => {
+                        // Response expired; ask user to re-enter phone number
+                        window.recaptchaVerifier.render().then((widgetId) => {
+                            window.recaptchaVerifier.reset(widgetId);
+                        });
+                    },
                 },
-            },
-            auth
-        );
+                auth // Pass the auth instance
+            );
+        }
     };
 
-    // Send SMS code
-    const sendVerificationCode = () => {
+    const sendVerificationCode = (e) => {
+        e.preventDefault();
         setupRecaptcha();
-        const appVerifier = window.recaptchaVerifier;
 
+        const appVerifier = window.recaptchaVerifier;
         signInWithPhoneNumber(auth, phoneNumber, appVerifier)
             .then((confirmationResult) => {
-                window.confirmationResult = confirmationResult;
-                setIsCodeSent(true);
-                alert('Verification code sent to your phone!');
+                setConfirmationResult(confirmationResult);
+                alert("Verification code sent!");
             })
             .catch((error) => {
-                console.error('Error during sign-in:', error);
+                console.error("Error during signInWithPhoneNumber:", error);
+                alert("Error: " + error.message);
             });
     };
 
-    // Verify the entered code
-    const verifyCode = () => {
-        window.confirmationResult
-            .confirm(verificationCode)
-            .then((result) => {
-                const user = result.user;
-                alert('Phone authentication successful!');
-                console.log('Authenticated user:', user);
-            })
-            .catch((error) => {
-                console.error('Error verifying code:', error);
-                alert('Incorrect verification code.');
-            });
+    const verifyCode = (e) => {
+        e.preventDefault();
+        if (confirmationResult) {
+            confirmationResult
+                .confirm(verificationCode)
+                .then((result) => {
+                    const user = result.user;
+                    alert("User verified successfully!");
+                })
+                .catch((error) => {
+                    console.error("Error verifying code:", error);
+                    alert("Error: " + error.message);
+                });
+        }
     };
 
     return (
-        <div className="phone-auth-container">
-            <h2>Phone Authentication</h2>
-
-            {!isCodeSent ? (
-                <>
-                    <input
-                        type="tel"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="Enter phone number (+123456789)"
-                        className="phone-input"
-                    />
-                    <button onClick={sendVerificationCode} className="send-code-btn">
-                        Send Verification Code
-                    </button>
-                </>
-            ) : (
-                <div className="code-verification-section">
+        <div>
+            <div id="recaptcha-container"></div>
+            <form onSubmit={sendVerificationCode}>
+                <input
+                    type="text"
+                    placeholder="Enter phone number (with country code)"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+                <button type="submit">Send Verification Code</button>
+            </form>
+            {confirmationResult && (
+                <form onSubmit={verifyCode}>
                     <input
                         type="text"
+                        placeholder="Enter verification code"
                         value={verificationCode}
                         onChange={(e) => setVerificationCode(e.target.value)}
-                        placeholder="Enter verification code"
-                        className="code-input"
                     />
-                    <button onClick={verifyCode} className="verify-code-btn">
-                        Verify Code
-                    </button>
-                </div>
+                    <button type="submit">Verify Code</button>
+                </form>
             )}
-
-            {/* Recaptcha */}
-            <div id="recaptcha-container"></div>
         </div>
     );
 };
