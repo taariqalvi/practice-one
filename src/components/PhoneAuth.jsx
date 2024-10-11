@@ -3,6 +3,8 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth } from "../firebaseConfig"; // Adjust path as necessary
 import "./PhoneAuth.css";
 
+auth.settings.appVerificationDisabledForTesting = true;
+
 const PhoneAuth = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [verificationCode, setVerificationCode] = useState("");
