@@ -5,7 +5,7 @@ import "./PhoneAuth.css";
 import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css'
 
-auth.settings.appVerificationDisabledForTesting = true;
+// auth.settings.appVerificationDisabledForTesting = true;
 
 const PhoneAuth = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
