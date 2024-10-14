@@ -69,7 +69,7 @@ const PhoneAuth = () => {
     };
 
     return (
-        <div>
+        <div className="phone-auth-container">
             <div id="recaptcha-container"></div>
             <form onSubmit={sendVerificationCode} className="phoneAuthForm">
                 {/* <input
@@ -82,6 +82,7 @@ const PhoneAuth = () => {
                     country={"us"}
                     value={phoneNumber}
                     onChange={(phone) => setPhoneNumber(phone)}
+                    className="phone-input"
                 />
                 <button type="submit">Send Verification Code</button>
             </form>
