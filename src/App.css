@@ -1,11 +1,12 @@
-#root {
+/* #root {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
   background-color: lightgray;
-}
+} */
+
 
 ul {
   display: flex;
@@ -24,7 +25,29 @@ ul li a {
   border-radius: 4px;
 }
 
-input {
+/* input {
   padding: 8px 12px;
   margin-right: 1rem;
+} */
+
+/* .phoneAuthForm {
+  margin: 0px;
+}
+
+.phoneAuthForm button {
+  background-color: brown;
+  width: 300px;
+  color: white;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.phoneAuthForm .phone-input {
+  position: absolute;
+  top: 30%;
+} */
+
+.recaptcha-container {
+  margin: 20px 0;
+  min-height: 78px; /* Adjust this depending on recaptcha size */
 }

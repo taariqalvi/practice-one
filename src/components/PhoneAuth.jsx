@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { auth } from "../firebaseConfig"; // Adjust path as necessary
+import { auth } from "../firebaseConfig";
 import "./PhoneAuth.css";
+import PhoneInput from "react-phone-input-2";
+import 'react-phone-input-2/lib/style.css'
 
 auth.settings.appVerificationDisabledForTesting = true;
 
@@ -10,6 +12,7 @@ const PhoneAuth = () => {
     const [verificationCode, setVerificationCode] = useState("");
     const [confirmationResult, setConfirmationResult] = useState(null);
 
+
     // Set up reCAPTCHA verifier
     const setupRecaptcha = () => {
         // Check if recaptchaVerifier is already created
@@ -17,7 +20,7 @@ const PhoneAuth = () => {
             window.recaptchaVerifier = new RecaptchaVerifier(
                 "recaptcha-container", // The HTML element ID where reCAPTCHA will render
                 {
-                    size: "invisible", // Make it invisible; alternatively, you can set it to 'normal'
+                    size: "normal", // Make it invisible; alternatively, you can set it to 'normal'
                     callback: (response) => {
                         // reCAPTCHA solved - will proceed with send verification code
                     },
@@ -68,12 +71,17 @@ const PhoneAuth = () => {
     return (
         <div>
             <div id="recaptcha-container"></div>
-            <form onSubmit={sendVerificationCode}>
-                <input
+            <form onSubmit={sendVerificationCode} className="phoneAuthForm">
+                {/* <input
                     type="text"
                     placeholder="Enter phone number (with country code)"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
+                /> */}
+                <PhoneInput
+                    country={"us"}
+                    value={phoneNumber}
+                    onChange={(phone) => setPhoneNumber(phone)}
                 />
                 <button type="submit">Send Verification Code</button>
             </form>
